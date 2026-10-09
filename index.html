@@ -1,0 +1,140 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Chiết cành tương tác</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<style>
+/* Layout: một cột 720px, thanh tab trên cùng, mỗi tab là một hoạt động học tập */
+:root{
+  --bg:#f5f7f1; --surface:#ffffff; --fg:#1d2a1c; --muted:#5b6a58; --line:#d9e0d3;
+  --accent:#2f6b3a; --accent-soft:#e3efe0; --bark:#8a5a36; --wood:#ecd9b4; --soil:#d8c3a2; --root:#f7f3ea; --callus:#b9d38a;
+  --bad:#a63b2a; --bad-soft:#f7e4df;
+  --f-display:'Fraunces',Georgia,serif; --f-body:'Be Vietnam Pro',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12170f; --surface:#1b2218; --fg:#e8eee4; --muted:#9fb09a; --line:#2e3a2a;
+  --accent:#8fcb98; --accent-soft:#23331f; --bark:#b88458; --wood:#6e5a3a; --soil:#4a3f2e; --root:#efe8d6; --callus:#8fae5e;
+  --bad:#e68a78; --bad-soft:#3a2420; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12170f; --surface:#1b2218; --fg:#e8eee4; --muted:#9fb09a; --line:#2e3a2a;
+  --accent:#8fcb98; --accent-soft:#23331f; --bark:#b88458; --wood:#6e5a3a; --soil:#4a3f2e; --root:#efe8d6; --callus:#8fae5e;
+  --bad:#e68a78; --bad-soft:#3a2420; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6;padding-inline:16px;padding-block:24px 48px}
+main{max-width:720px;margin:0 auto}
+h1{font-family:var(--f-display);font-size:clamp(1.6rem,5vw,2.2rem);line-height:1.15;margin:0 0 4px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 20px;font-size:.95rem}
+[role=tablist]{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px;overflow-x:auto}
+[role=tab]{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:10px 14px;cursor:pointer;white-space:nowrap}
+[role=tab][aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:16px}
+.step{font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;color:var(--fg)}
+.step small{display:block;color:var(--muted);font-size:.78rem}
+.step[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px 20px}
+.panel h2,.panel h3{font-family:var(--f-display);margin:0 0 8px;font-size:1.25rem}
+.lbl{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px;font-weight:600}
+.panel p{margin:0}
+.err{background:var(--bad-soft);border-radius:6px;padding:10px 12px;margin-top:14px;color:var(--fg)}
+.err b{color:var(--bad)}
+.stage-wrap{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:20px;align-items:center}
+@media(max-width:560px){.stage-wrap{grid-template-columns:1fr}}
+svg{width:100%;height:auto;display:block;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+svg text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.bark{fill:var(--bark)}.wood{fill:var(--wood)}.soil{fill:var(--soil);opacity:.55}.callus{fill:var(--callus)}
+.root{stroke:var(--root);stroke-width:2.5;stroke-linecap:round;fill:none}
+.flow{fill:var(--accent)}
+input[type=range]{width:100%;accent-color:var(--accent);margin:14px 0 4px}
+.ticks{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)}
+.hint{color:var(--muted);font-size:.9rem;margin:0 0 12px}
+.pool,.answer{display:flex;flex-wrap:wrap;gap:8px;min-height:44px}
+.answer{border:1px dashed var(--line);border-radius:8px;padding:8px;margin:10px 0}
+.chip{font:inherit;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;color:var(--fg)}
+.chip.ok{border-color:var(--accent);background:var(--accent-soft)}
+.chip.no{border-color:var(--bad);background:var(--bad-soft)}
+.act{font:inherit;font-weight:500;background:var(--accent);color:var(--bg);border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+.act.ghost{background:none;color:var(--accent);border:1px solid var(--accent)}
+.msg{min-height:1.6em;margin:10px 0 0;font-weight:500}
+.foot{margin-top:28px;color:var(--muted);font-size:.85rem}
+</style>
+<main>
+<h1>Chiết cành</h1>
+<p class="sub">Công nghệ 10, Công nghệ trồng trọt · Nhân giống vô tính cây ăn quả. Bản số đi kèm sơ đồ giấy.</p>
+<div role="tablist" aria-label="Hoạt động">
+  <button role="tab" id="t0" aria-selected="true" aria-controls="p0">Quy trình 5 bước</button>
+  <button role="tab" id="t1" aria-selected="false" aria-controls="p1">Bên trong cành</button>
+  <button role="tab" id="t2" aria-selected="false" aria-controls="p2">Tự kiểm tra</button>
+</div>
+
+<section id="p0" role="tabpanel" aria-labelledby="t0">
+  <p class="hint">Chọn từng bước để xem việc cần làm, lý do và lỗi hay gặp. Đối chiếu với sơ đồ giấy của nhóm.</p>
+  <div class="steps" id="steps"></div>
+  <div class="panel" id="detail"></div>
+</section>
+
+<section id="p1" role="tabpanel" aria-labelledby="t1" hidden>
+  <p class="hint">Kéo thanh trượt để xem điều xảy ra bên trong cành sau khi khoanh vỏ. Hình minh họa sơ đồ, không vẽ theo tỉ lệ thật.</p>
+  <div class="stage-wrap">
+    <svg id="svg" viewBox="0 0 320 300" role="img" aria-label="Mặt cắt dọc cành chiết"></svg>
+    <div>
+      <div class="panel"><h3 id="sTitle"></h3><p id="sText"></p></div>
+      <input type="range" id="slide" min="0" max="3" value="0" step="1" aria-label="Giai đoạn của cành chiết">
+      <div class="ticks"><span>Vừa bó bầu</span><span>Vài ngày</span><span>Vài tuần</span><span>Khi cắt</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+  <p class="hint">Chạm vào các thẻ theo đúng thứ tự từ bước đầu đến bước cuối.</p>
+  <div class="pool" id="pool"></div>
+  <div class="answer" id="answer" aria-live="polite"></div>
+  <button class="act ghost" id="reset">Xáo lại</button>
+  <p class="msg" id="msg"></p>
+</section>
+<p class="foot">Thời gian ra rễ khác nhau tùy loài cây. Dùng dao sắc cẩn thận khi khoanh vỏ.</p>
+</main>
+<script>
+const S=[
+ {n:'Chọn cành',w:'Chọn cành bánh tẻ (không non, không già), khỏe, không sâu bệnh, nằm ngoài tán nơi đón nhiều nắng.',y:'Cành khỏe tích lũy nhiều chất dinh dưỡng nên dễ ra rễ, cây con sau này sinh trưởng tốt.',e:'Chọn cành quá già, cành sâu bệnh hoặc cành mọc khuất trong tán.'},
+ {n:'Khoanh vỏ',w:'Dùng dao sắc khoanh hai vòng quanh cành, cách nhau 3–5 cm. Bóc phần vỏ ở giữa rồi cạo sạch lớp nhớt trên mặt gỗ.',y:'Bóc vỏ cắt đường đi xuống của chất dinh dưỡng từ lá. Chất dinh dưỡng tích lại ở mép trên vết khoanh và kích thích cành ra rễ.',e:'Không cạo sạch lớp nhớt: vỏ liền lại, cành không ra rễ.'},
+ {n:'Bó bầu',w:'Đắp đất tơi xốp hoặc xơ dừa đã làm ẩm quanh vết khoanh, bọc nilon bên ngoài và buộc chặt hai đầu.',y:'Bầu giữ ẩm, thoáng và tối, tạo điều kiện cho rễ non hình thành.',e:'Buộc nilon lỏng: đất tụt, bầu mất ẩm hoặc ngấm nước mưa.'},
+ {n:'Chăm sóc',w:'Kiểm tra bầu định kỳ, bổ sung nước nếu bầu khô. Quan sát rễ qua lớp nilon.',y:'Rễ non rất dễ chết khi bầu khô, nhưng bầu ngập nước cũng làm rễ hỏng.',e:'Để bầu khô, hoặc tưới quá nhiều làm bầu úng.'},
+ {n:'Cắt và giâm',w:'Khi rễ mọc nhiều, cắt cành ngay dưới bầu rễ, tháo nilon nhẹ tay, tỉa bớt lá rồi giâm vào bầu hoặc vườn ươm, che mát.',y:'Tỉa lá để giảm mất nước vì rễ mới chưa hút nước mạnh. Che mát giúp cây con hồi phục.',e:'Cắt khi rễ còn ít hoặc làm vỡ bầu rễ.'}];
+const $=s=>document.querySelector(s);
+// tabs
+document.querySelectorAll('[role=tab]').forEach((t,i)=>t.onclick=()=>{
+  document.querySelectorAll('[role=tab]').forEach((x,j)=>{x.setAttribute('aria-selected',i===j);$('#p'+j).hidden=i!==j});
+});
+// steps
+S.forEach((s,i)=>{const b=document.createElement('button');b.className='step';b.innerHTML='<small>Bước '+(i+1)+'</small>'+s.n;b.onclick=()=>show(i);$('#steps').appendChild(b)});
+function show(i){const s=S[i];
+  document.querySelectorAll('.step').forEach((b,j)=>b.setAttribute('aria-pressed',i===j));
+  $('#detail').innerHTML='<h2>Bước '+(i+1)+'. '+s.n+'</h2><div class="lbl">Việc cần làm</div><p>'+s.w+'</p><div class="lbl">Vì sao</div><p>'+s.y+'</p><div class="err"><b>Lỗi hay gặp.</b> '+s.e+'</div>'}
+show(0);
+// inside the branch
+const T=[
+ ['Vừa bó bầu','Vỏ ở giữa đã được bóc, gỗ lộ ra và được cạo sạch. Bầu đất ẩm bao quanh vết khoanh.'],
+ ['Sau vài ngày','Chất dinh dưỡng từ lá đi xuống theo phần vỏ bị chặn lại ở mép trên vết khoanh. Mép trên bắt đầu phình ra.'],
+ ['Sau vài tuần','Mép trên hình thành mô sẹo, các rễ non nhú ra và lan vào bầu ẩm. Nhìn thấy rễ qua lớp nilon.'],
+ ['Khi cắt cành','Rễ mọc đủ và lan khắp bầu, có rễ bên. Cành có thể cắt khỏi cây mẹ để giâm.']];
+function draw(k){
+  let h='<rect class="soil" x="60" y="90" width="200" height="120" rx="16"/><text x="66" y="84">Bầu đất ẩm</text>';
+  h+='<rect class="bark" x="130" y="10" width="60" height="110"/><rect class="bark" x="130" y="180" width="60" height="110"/><rect class="wood" x="140" y="10" width="40" height="280"/>';
+  h+='<text x="124" y="40" text-anchor="end">Vỏ</text><text x="198" y="40">Gỗ</text>';
+  if(k>=1){h+='<path class="flow" d="M131 70h8l-4 8zM181 70h8l-4 8zM131 94h8l-4 8zM181 94h8l-4 8z"/><text x="198" y="78">Chất dinh dưỡng</text><text x="198" y="92">bị chặn lại</text>';
+    const rx=k===1?30:38,ry=k===1?5:k===2?9:10;h+='<ellipse class="callus" cx="160" cy="120" rx="'+rx+'" ry="'+ry+'"/>'}
+  if(k>=2){h+='<g class="root"><path d="M142 126L108 152M178 126L212 154M150 128L122 176"/></g>'}
+  if(k>=3){h+='<g class="root"><path d="M170 128L204 190M146 126L84 150M160 128L160 196M122 176L100 190M204 190L226 200M84 150L70 170"/></g>'}
+  $('#svg').innerHTML=h;$('#sTitle').textContent=T[k][0];$('#sText').textContent=T[k][1]}
+$('#slide').oninput=e=>draw(+e.target.value);draw(0);
+// order quiz
+let next=0;
+function build(){next=0;$('#msg').textContent='';$('#answer').innerHTML='';const pool=$('#pool');pool.innerHTML='';
+  const idx=[...S.keys()];let o;do{o=idx.slice().sort(()=>Math.random()-.5)}while(o.every((v,i)=>v===i));
+  o.forEach(i=>{const b=document.createElement('button');b.className='chip';b.textContent=S[i].n;
+    b.onclick=()=>{if(i===next){b.className='chip ok';b.disabled=true;$('#answer').appendChild(b);next++;
+        $('#msg').textContent=next===5?'Đúng cả 5 bước. Chuyển sang đối chiếu với sơ đồ giấy của nhóm.':'Đúng. Bước tiếp theo?'}
+      else{b.className='chip no';$('#msg').textContent=next===0?'Chưa đúng. Việc nào phải làm đầu tiên?':'Chưa đúng. Việc nào làm ngay sau "'+S[next-1].n+'"?';setTimeout(()=>b.className='chip',700)}};
+    pool.appendChild(b)})}
+$('#reset').onclick=build;build();
+</script>
+
+</body></html>
